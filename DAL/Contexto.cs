@@ -6,5 +6,5 @@ namespace JoseRivera_AP1_P2.DAL;
 public class Contexto:DbContext
 {
     public Contexto(DbContextOptions<Contexto>options) :base(options){ }
-    public DbSet<Registros> Registros { get; set; }
+    public DbSet<Registros> registros { get; set; }
 }
