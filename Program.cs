@@ -1,10 +1,19 @@
 using JoseRivera_AP1_P2.Components;
+using JoseRivera_AP1_P2.DAL;
+using JoseRivera_AP1_P2.Services;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+// La inyecci?n del contexto con SqlServer
+var SqlConStr = builder.Configuration.GetConnectionString("SqlConStr");
+builder.Services.AddDbContextFactory<Contexto>(o => o.UseSqlServer(SqlConStr));
+
+//La inyeccion del servicios
+builder.Services.AddScoped<RegistroServices>();
 
 var app = builder.Build();
 
