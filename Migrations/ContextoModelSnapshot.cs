@@ -39,7 +39,7 @@ namespace JoseRivera_AP1_P2.Migrations
 
                     b.HasKey("RegistroId");
 
-                    b.ToTable("Registros");
+                    b.ToTable("registros");
                 });
 #pragma warning restore 612, 618
         }

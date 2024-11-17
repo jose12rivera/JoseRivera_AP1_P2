@@ -11,7 +11,7 @@ namespace JoseRivera_AP1_P2.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Registros",
+                name: "registros",
                 columns: table => new
                 {
                     RegistroId = table.Column<int>(type: "int", nullable: false)
@@ -21,7 +21,7 @@ namespace JoseRivera_AP1_P2.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Registros", x => x.RegistroId);
+                    table.PrimaryKey("PK_registros", x => x.RegistroId);
                 });
         }
 
@@ -29,7 +29,7 @@ namespace JoseRivera_AP1_P2.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Registros");
+                name: "registros");
         }
     }
 }
