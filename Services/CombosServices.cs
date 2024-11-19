@@ -90,7 +90,6 @@ public class CombosServices(IDbContextFactory<Contexto> DbFactory)
         await using var contexto = await DbFactory.CreateDbContextAsync();
         return await contexto.combos
             .Include(c => c.CombosDetalles)
-            .AsNoTracking()
             .Where(Criterio)
             .ToListAsync();
     }
