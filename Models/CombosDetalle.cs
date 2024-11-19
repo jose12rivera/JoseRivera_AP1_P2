@@ -14,6 +14,6 @@ public class CombosDetalle
     public int ArticuloId { get; set; }
     [ForeignKey("ArticuloId")]
     public Articulos? Articulos { get; set; }
-    public decimal? Cantidad {get; set;}
+    public string? Cantidad {get; set;}
     public decimal? Costo{get; set;}
 }
