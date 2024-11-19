@@ -15,7 +15,7 @@
                     <label for="filtro" class="form-label"><strong>Filtrar Por:</strong></label>
                     <select @bind="filtro" class="form-select"> 
                         <option value="id">ComboId</option>
-                        <option value="Fecha">Precio</option>
+                        <option value="Fecha">Fecha</option>
                         <option value="Descripcion">Descripcion</option>
                         <option value="Precio">Precio</option>
                         <option value="Vendido">Vendido</option>
@@ -27,7 +27,7 @@
                     <label for="valorfiltro" class="form-label"><strong>Busqueda:</strong></label>
                     <div class="input-group">
                         <input @bind="valorfiltro" class="form-control"/>
-                        <button type="button" class="btn btn-outline-primary">
+                        <button type="button" @onclick="Buscar" class="btn btn-outline-primary">
                             <span class="bi bi-search mt-3"></span>
                             Buscar
                         </button>

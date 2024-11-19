@@ -152,7 +152,7 @@
     }
     protected override async Task OnInitializedAsync()
     {
-       ListaArticulo = await articulosServices.ListarArticulos();
+        ListaArticulo = await articulosServices.ListarArticulos();
     }
     public async Task AgregarDetalle(){
         if(!string.IsNullOrWhiteSpace(combosDetalle.Cantidad)){
@@ -164,7 +164,8 @@
                Costo= combosDetalle.Costo
 
             };
-
+            ListacombosDetalle.Add(NuevoDetalle);
+            combosDetalle = new CombosDetalle();
             toastService.Notify(new(ToastType.Success, "Existo", "Se agrego"));
         }
     }

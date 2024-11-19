@@ -173,7 +173,8 @@
                     Costo = combosDetalle.Costo
 
                 };
-
+            ListacombosDetalle.Add(NuevoDetalle);
+            combosDetalle = new CombosDetalle();
             toastService.Notify(new(ToastType.Success, "Existo", "Se agrego"));
         }
     }
