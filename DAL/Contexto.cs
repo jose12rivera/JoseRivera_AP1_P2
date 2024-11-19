@@ -13,7 +13,8 @@ public class Contexto:DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<Articulos>().HasData(new List<Articulos>() {
+        modelBuilder.Entity<Articulos>().HasData(new List<Articulos>()
+        {
          new Articulos() { ArticuloId=1,Nombre="Mouse",Descripcion="Del"},
          new Articulos() { ArticuloId=2,Nombre="Ram",Descripcion="64 GB"},
          new Articulos() { ArticuloId=3,Nombre="Teclado",Descripcion="Gamer 7!"},

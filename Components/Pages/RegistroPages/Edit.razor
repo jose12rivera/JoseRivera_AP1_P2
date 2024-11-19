@@ -139,7 +139,7 @@
     public List<Articulos> ListaArticulos { get; set; } = new List<Articulos>();
 
     public List<Combos> ListaCombos { get; set; } = new List<Combos>();
-    public Combos? combo { get; set; } = new Combos();
+    public Combos combo { get; set; } = new Combos();
     public List<CombosDetalle> ListacombosDetalle { get; set; } = new List<CombosDetalle>();
     public CombosDetalle? combosDetalle { get; set; } = new CombosDetalle();
     private bool existe = false;
@@ -149,6 +149,11 @@
         combo = new Combos();
         combosDetalle = new CombosDetalle();
         existe = false;
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        combo = await combosServices.Buscar(ComboId) ?? new Combos();
+        ListacombosDetalle = combo.CombosDetalles.ToList() ?? new List<CombosDetalle>();
     }
     public async Task AgregarDetalle()
     {
@@ -174,8 +179,8 @@
 
     public async Task<bool> Validar()
     {
-        existe = await combosServices.Existe(combo.ComboId);
-        return !existe;
+        var listacombos = await combosServices.Listar(c => c.Descripcion.ToLower() == combo.Descripcion.ToLower() && c.ComboId != combo.ComboId);
+        return listacombos.Count == 0;
     }
     public async Task Guardar()
     {
@@ -191,19 +196,7 @@
             toastService.Notify(new(ToastType.Success, "Existo", "Se Guardo"));
         }
     }
-    public async Task Buscar()
-    {
-        existe = false;
-        var encontrado = await combosServices.Buscar(combo.ComboId);
-        if (encontrado != null)
-        {
-            combo = encontrado;
-        }
-        else
-        {
-            Nuevo();
-        }
-    }
+    
     public async Task Volver()
     {
         toastService.Notify(new(ToastType.Success, "Existo", "Ya volvio"));
