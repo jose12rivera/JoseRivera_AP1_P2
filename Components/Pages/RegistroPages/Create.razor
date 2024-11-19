@@ -1,5 +1,6 @@
 ﻿@page "/Combos/Create"
 @inject CombosServices combosServices
+@inject ArticulosServices articulosServices
 @inject NavigationManager navigationManager
 @rendermode InteractiveServer
 @inject ToastService toastService
@@ -52,7 +53,7 @@
                                     <label for="ArticuloId" class="form-label"><strong>ArticuloId:</strong></label>
                                     <InputSelect @bind-Value="combosDetalle.ArticuloId" class="form-control">
                                         <option value="0">Elejir un Articulo</option>
-                                        @foreach (var articulo in ListaArticulos)
+                                        @foreach (var articulo in ListaArticulo)
                                         {
                                             <option value="@articulo.ArticuloId">@articulo.Descripcion</option>
                                         }
@@ -136,7 +137,7 @@
 @code {
     [Parameter]
     public int ComboId{ get; set; }
-    public List<Articulos> ListaArticulos { get; set; } = new List<Articulos>();
+    public List<Articulos> ListaArticulo { get; set; } = new List<Articulos>();
     public Articulos? articulos { get; set; } = new Articulos();
     public List<Combos> ListaCombos { get; set; } = new List<Combos>();
     public Combos? combo { get; set; } = new Combos();
@@ -148,6 +149,10 @@
         combo = new Combos();
         combosDetalle = new CombosDetalle();
         existe = false;
+    }
+    protected override async Task OnInitializedAsync()
+    {
+       ListaArticulo = await articulosServices.ListarArticulos();
     }
     public async Task AgregarDetalle(){
         if(!string.IsNullOrWhiteSpace(combosDetalle.Cantidad)){
