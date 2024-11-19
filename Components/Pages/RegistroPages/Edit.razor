@@ -61,6 +61,7 @@
 
                                     <ValidationMessage For="@(()=>combosDetalle.ArticuloId)" />
                                 </div>
+
                                 <div class="col-md-3 p-0">
                                     <label for="Cantidad" class="form-label"><strong>Cantidad:</strong></label>
                                     <div class="input-group">
@@ -68,6 +69,7 @@
                                     </div>
                                     <ValidationMessage For="@(()=>combosDetalle.Cantidad)" />
                                 </div>
+
                                 <div class="col-md-2 p-0">
                                     <label for="Costo" class="form-label"><strong>Costo:</strong></label>
                                     <div class="input-group">
@@ -75,9 +77,10 @@
                                     </div>
                                     <ValidationMessage For="@(()=>combosDetalle.Costo)" />
                                 </div>
+
                                 <div class="col-md-1 p-0">
                                     <button type="button" @onclick="AgregarDetalle" class="btn btn-outline-success">
-                                        <span class="bi bi-plus-square-fill-nav-menu mt-3"></span>
+                                        <span class="bi bi-plus "></span>
                                         Agregar
                                     </button>
                                 </div>
