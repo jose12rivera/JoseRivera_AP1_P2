@@ -1,5 +1,131 @@
-﻿<h3>Delete</h3>
+﻿@page "/Combos/Delete"
+@page "/Combos/Delete/{ComboId:int}"
+@inject CombosServices combosServices
+@inject ArticulosServices articulosServices
+@inject NavigationManager navigationManager
+@rendermode InteractiveServer
+@inject ToastService toastService
+
+
+<div class="container">
+    <div class="card shadow-lg mt-3">
+        <div class="card-header text-center">
+            <h5>Registros Combos</h5>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <label for="ComboId" class="col-md-2 text-end col-form-label"><strong>ComboId:</strong></label>
+                <div class="col-md-1">
+                    <span class="form-control-plaintext">@combo.ComboId</span>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label for="Fecha" class="col-md-2 text-end col-form-label"><strong>Fecha:</strong></label>
+                <div class="col-md-1">
+                    <span class="form-control-plaintext">@combo.Fecha</span>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label for="Descripcion" class="col-md-2 text-end col-form-label"><strong>Descripcion:</strong></label>
+                <div class="col-md-1">
+                    <span class="form-control-plaintext">@combo.Descripcion</span>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label for="Precio" class="col-md-2 text-end col-form-label"><strong>Precio:</strong></label>
+                <div class="col-md-1">
+                    <span class="form-control-plaintext">@combo.Precio</span>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label for="Vendido" class="col-md-2 text-end col-form-label"><strong>Vendido:</strong></label>
+                <div class="col-md-1">
+                    <span class="form-control-plaintext">@combo.Vendido</span>
+                </div>
+            </div>
+            <div class="border border-success mt-3">
+                <h5>Detalle ComboDetalle</h5>
+
+                <div class="card-body">
+                    <table class="table table-light table-bordered ">
+                        <thead class="table table-striped text-center">
+                            <tr>
+                                <th>ArticuloId</th>
+                                <th>Cantidad</th>
+                                <th>Costo</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var detalle in ListacombosDetalle)
+                            {
+                                var descripcionArticulo = ListaArticulos
+                                .FirstOrDefault(a => a.ArticuloId == detalle.ArticuloId)?.Descripcion ?? "No encontrado";
+                                <tr>
+                                    <td>@descripcionArticulo</td>
+                                   
+                                    <td>@detalle.Cantidad</td>
+                                    <td>@string.Format("{0:C}", detalle.Costo)</td>
+
+
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+
+                </div>
+
+                <div class="card-footer justify-content-center text-center">
+                    <button type="button" @onclick="EliminarCombo" class="btn btn-outline-danger">
+                        <span class="bi bi-trash mt-3"></span>
+                       Eliminar
+                    </button>
+                    <button type="button" @onclick="Volver" class="btn btn-outline-primary">
+                        <span class="bi bi-arrow-left"></span>
+                        Volver
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 @code {
+    [Parameter]
+    public int ComboId { get; set; }
+    public List<Articulos> ListaArticulos { get; set; } = new List<Articulos>();
 
+    public List<Combos> ListaCombos { get; set; } = new List<Combos>();
+    public Combos combo { get; set; } = new Combos();
+    public List<CombosDetalle> ListacombosDetalle { get; set; } = new List<CombosDetalle>();
+    public CombosDetalle? combosDetalle { get; set; } = new CombosDetalle();
+    private bool existe = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListaArticulos = await articulosServices.ListarArticulos();
+        if (ComboId != 0)
+        {
+            combo = await combosServices.Buscar(ComboId)?? new Combos();
+            ListacombosDetalle = combo.CombosDetalles.ToList()??new List<CombosDetalle>();
+           
+        }
+
+    }
+
+    public async Task EliminarCombo(){
+        if(ComboId==0||combo==null){
+            return;
+        }
+        if(await combosServices.Eliminar(ComboId)){
+            toastService.Notify(new(ToastType.Danger, "Existo", "Ya Elimino"));
+            Volver();
+        }
+    }
+    public async Task Volver()
+    {
+        toastService.Notify(new(ToastType.Primary, "Existo", "Ya volvio"));
+        navigationManager.NavigateTo("/Combos/Index");
+    }
 }
+

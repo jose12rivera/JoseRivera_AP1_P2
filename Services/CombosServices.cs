@@ -39,13 +39,15 @@ public class CombosServices(IDbContextFactory<Contexto> DbFactory)
             .ExecuteDeleteAsync();
         return eliminado > 0;
     }
-    public async Task<Combos?> Buscar(int id)
+  
+    public async Task<Combos?> Buscar(int comboId)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
         return await contexto.combos
-            .AsNoTracking()
-            .FirstOrDefaultAsync(r => r.ComboId == id);
+            .Include(c => c.CombosDetalles)
+            .FirstOrDefaultAsync(c => c.ComboId == comboId);
     }
+
     private async Task<bool> Modificar(Combos combo)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
@@ -71,6 +73,7 @@ public class CombosServices(IDbContextFactory<Contexto> DbFactory)
         return await contexto.SaveChangesAsync() > 0;
     }
 
+    
     public async Task<bool> EliminarDetalle(int detalleId)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
@@ -85,6 +88,7 @@ public class CombosServices(IDbContextFactory<Contexto> DbFactory)
 
         return false;
     }
+
     public async Task<List<Combos>> Listar(Expression<Func<Combos, bool>> Criterio)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
@@ -93,6 +97,7 @@ public class CombosServices(IDbContextFactory<Contexto> DbFactory)
             .Where(Criterio)
             .ToListAsync();
     }
+  
 
     public async Task<List<Combos>> ListarCombos()
     {

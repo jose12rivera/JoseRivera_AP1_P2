@@ -64,17 +64,17 @@
                                 <td>@c.ComboId</td>
                                 <td>@c.Fecha</td>
                                 <td>@c.Descripcion</td>
-                                <td>@c.Precio</td>
+                                <td>@string.Format("{0:C}", c.Precio)</td>
                                 <td>@c.Vendido</td>
 
                                 <td class="text-center">
-                                    <a href="Details/@c.ComboId" class="btn btn-outline-primary bi bi-eye mt-3"></a>
+                                    <a href="/Combos/Details/@c.ComboId" class="btn btn-outline-primary bi bi-eye mt-3"></a>
                                 </td>
                                 <td class="text-center">
                                         <a href="/Combos/Edit/@c.ComboId" class="btn btn-outline-success bi bi-pencil-square mt-3"></a>
                                 </td>
                                 <td class="text-center">
-                                    <a href="Delete/@c.ComboId" class="btn btn-outline-danger bi bi-trash mt-3"></a>
+                                    <a href="/Combos/Delete/@c.ComboId" class="btn btn-outline-danger bi bi-trash mt-3"></a>
                                 </td>
                             </tr>
                         }

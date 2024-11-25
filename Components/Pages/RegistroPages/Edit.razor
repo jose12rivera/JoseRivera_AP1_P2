@@ -3,8 +3,8 @@
 @inject CombosServices combosServices
 @inject ArticulosServices articulosServices
 @inject NavigationManager navigationManager
-@rendermode InteractiveServer
 @inject ToastService toastService
+@rendermode InteractiveServer
 
 <EditForm Model="combo" OnValidSubmit="Guardar">
     <DataAnnotationsValidator />
@@ -36,9 +36,13 @@
                     </div>
                     <div class="mb-4">
                         <label for="Precio" class="form-label"><strong>Precio:</strong></label>
-                        <InputNumber @bind-Value="combo.Precio" class="form-control" />
-                        <ValidationMessage For="@(()=>combo.Precio)" />
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>  
+                            <InputNumber @bind-Value="combo.Precio" class="form-control" disabled />
+                        </div>
+                        <ValidationMessage For="@(() => combo.Precio)" />
                     </div>
+
                     <div class="mb-4">
                         <label for="Vendido" class="form-label"><strong>Vendido:</strong></label>
                         <InputText @bind-Value="combo.Vendido" class="form-control" />
@@ -49,44 +53,44 @@
                         <h5>Registros comboDetalle</h5>
                         <div class="card-body">
                             <div class="row align-items-end m-0">
-                                <div class="col-md-4 p-0">
 
-                                    <InputSelect class="form-control" @bind-Value="combosDetalle.ArticuloId">
-                                        <option value="0">Elejir un Articulo</option>
-                                        @foreach (var articulo in ListaArticulos)
+                                <div class="col-md-4 p-0">
+                                    <label for="ArticuloId" class="form-label"></label>
+                                    <InputSelect @bind-Value="combosDetalle.ArticuloId" class="form-control">
+                                        <option value="0" class="bold-option">Elejir un Articulo</option>
+                                        @foreach (var articulo in ListaArticulo)
                                         {
                                             <option value="@articulo.ArticuloId">@articulo.Descripcion</option>
                                         }
                                     </InputSelect>
 
-                                    <ValidationMessage For="@(()=>combosDetalle.ArticuloId)" />
+                                    <ValidationMessage For="@(()=>articulos.ArticuloId)" />
                                 </div>
-
                                 <div class="col-md-3 p-0">
-                                    <label for="Cantidad" class="form-label"><strong>Cantidad:</strong></label>
+                                    <label for="Cantidad" class="form-label"></label>
                                     <div class="input-group">
+                                        <span class="input-group-text"><strong>Cantidad:</strong>$</span>
                                         <InputText @bind-Value="combosDetalle.Cantidad" class="form-control" />
                                     </div>
                                     <ValidationMessage For="@(()=>combosDetalle.Cantidad)" />
                                 </div>
-
                                 <div class="col-md-2 p-0">
-                                    <label for="Costo" class="form-label"><strong>Costo:</strong></label>
+                                    <label for="Costo" class="form-label"></label>
                                     <div class="input-group">
+                                        <span class="input-group-text"><strong>Costo:</strong>$</span>
                                         <InputNumber @bind-Value="combosDetalle.Costo" class="form-control" />
                                     </div>
                                     <ValidationMessage For="@(()=>combosDetalle.Costo)" />
+                                   
                                 </div>
-
                                 <div class="col-md-1 p-0">
                                     <button type="button" @onclick="AgregarDetalle" class="btn btn-outline-success">
-                                        <span class="bi bi-plus "></span>
+                                        <span class="bi bi-plus-square-fill-nav-menu mt-3"></span>
                                         Agregar
                                     </button>
                                 </div>
-
-                                
                             </div>
+
                             <table class="table table-light table-bordered ">
                                 <thead class="table table-striped text-center">
                                     <tr>
@@ -99,10 +103,13 @@
                                 <tbody>
                                     @foreach (var detalle in ListacombosDetalle)
                                     {
+                                        var descripcionArticulo = ListaArticulo
+                                        .FirstOrDefault(a => a.ArticuloId == detalle.ArticuloId)?.Descripcion ?? "No encontrado";
                                         <tr>
-                                            <td>@detalle.ArticuloId</td>
+
+                                            <td>@descripcionArticulo</td>
                                             <td>@detalle.Cantidad</td>
-                                            <td>@detalle.Costo</td>
+                                            <td>@string.Format("{0:C}", detalle.Costo)</td>
 
                                             <td class="text-center">
                                                 <button type="button" @onclick="()=>EliminarDetalle(detalle)" class="btn btn-outline-danger">
@@ -113,7 +120,6 @@
                                     }
                                 </tbody>
                             </table>
-                           
                         </div>
 
                         <div class="card-footer justify-content-center text-center">
@@ -142,28 +148,35 @@
 @code {
     [Parameter]
     public int ComboId { get; set; }
-    public List<Articulos> ListaArticulos { get; set; } = new List<Articulos>();
-
+    public List<Articulos> ListaArticulo { get; set; } = new List<Articulos>();
+    public Articulos? articulos { get; set; } = new Articulos();
     public List<Combos> ListaCombos { get; set; } = new List<Combos>();
-    public Combos combo { get; set; } = new Combos();
+    public Combos? combo { get; set; } = new Combos();
     public List<CombosDetalle> ListacombosDetalle { get; set; } = new List<CombosDetalle>();
     public CombosDetalle? combosDetalle { get; set; } = new CombosDetalle();
-    private bool existe = false;
+   
 
     public async Task Nuevo()
     {
         combo = new Combos();
         combosDetalle = new CombosDetalle();
-        existe = false;
+       
     }
+
     protected override async Task OnInitializedAsync()
     {
-        combo = await combosServices.Buscar(ComboId) ?? new Combos();
-        ListacombosDetalle = combo.CombosDetalles.ToList() ?? new List<CombosDetalle>();
+        ListaArticulo = await articulosServices.ListarArticulos();
+        if (ComboId != 0)
+        {
+            combo = await combosServices.Buscar(ComboId);
+            ListacombosDetalle = combo.CombosDetalles.ToList();
+            ActualizarPrecioCombo();
+        }
     }
+   
     public async Task AgregarDetalle()
     {
-        if (!string.IsNullOrWhiteSpace(combosDetalle.Cantidad))
+        if (!string.IsNullOrWhiteSpace(combosDetalle.Cantidad) && decimal.TryParse(combosDetalle.Cantidad, out decimal cantidadDecimal))
         {
             var NuevoDetalle = new CombosDetalle
                 {
@@ -171,44 +184,78 @@
                     ArticuloId = combosDetalle.ArticuloId,
                     Cantidad = combosDetalle.Cantidad,
                     Costo = combosDetalle.Costo
-
                 };
+
             ListacombosDetalle.Add(NuevoDetalle);
             combosDetalle = new CombosDetalle();
-            toastService.Notify(new(ToastType.Success, "Existo", "Se agrego"));
+
+            ActualizarPrecioCombo(); 
+
+            toastService.Notify(new(ToastType.Secondary, "Éxito", "Se agregó un detalle al combo."));
+        }
+        else
+        {
+            toastService.Notify(new(ToastType.Warning, "Error", "Cantidad inválida."));
         }
     }
+
+    public async Task ActualizarPrecioCombo()
+    {
+
+        combo.Precio = ListacombosDetalle.Sum(d =>
+        {
+
+            decimal cantidad = decimal.TryParse(d.Cantidad, out decimal cantidadDecimal) ? cantidadDecimal : 0;
+            decimal costo = d.Costo ?? 0;
+            return cantidad * costo;
+        });
+    }
+
+    
     public async Task EliminarDetalle(CombosDetalle detalle)
     {
-        ListacombosDetalle.Add(detalle);
-        toastService.Notify(new(ToastType.Success, "Existo", "Se agrego"));
+        ListacombosDetalle.Remove(detalle);
+
+        if (detalle.DetalleId != 0)
+        {
+            var entidadExistente = combo.CombosDetalles.FirstOrDefault(d => d.DetalleId == detalle.DetalleId);
+            if (entidadExistente != null)
+            {
+                combo.CombosDetalles.Remove(entidadExistente);
+            }
+        }
+
+        ActualizarPrecioCombo(); 
+
+        toastService.Notify(new(ToastType.Danger, "Éxito", "Detalle eliminado correctamente"));
     }
 
     public async Task<bool> Validar()
     {
-        var listacombos = await combosServices.Listar(c => c.Descripcion.ToLower() == combo.Descripcion.ToLower() && c.ComboId != combo.ComboId);
-        return listacombos.Count == 0;
+        var listaCombos = await combosServices.Listar(c => c.Descripcion.ToLower() == combo.Descripcion.ToLower() && c.ComboId != combo.ComboId);
+        return listaCombos.Count == 0;
     }
+
     public async Task Guardar()
     {
         combo.CombosDetalles = ListacombosDetalle;
         if (!await Validar())
         {
+            
             return;
         }
 
         var guardado = await combosServices.Guardar(combo);
         if (guardado)
         {
-            toastService.Notify(new(ToastType.Success, "Existo", "Se Guardo"));
+            toastService.Notify(new(ToastType.Success, "Éxito", "Combo guardado"));
         }
     }
-    
+
     public async Task Volver()
     {
-        toastService.Notify(new(ToastType.Success, "Existo", "Ya volvio"));
+
+        toastService.Notify(new(ToastType.Primary, "Éxito", "Combo guardado"));
         navigationManager.NavigateTo("/Combos/Index");
     }
-
 }
-
