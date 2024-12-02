@@ -1,12 +1,12 @@
-﻿@page "/Registro/Index"
-@inject RegistroServices registroServices
+﻿@page "/Combos/Index"
+@inject CombosServices combosServices
 @inject NavigationManager navigationManager
 @rendermode InteractiveServer
 
 <div class="container">
     <div class="card shadow-lg mt-3">
         <div class="card-header text-center">
-            <h5>Registros</h5>
+            <h5>Registros Combos</h5>
         </div>
 
         <div class="card-body">
@@ -14,9 +14,12 @@
                 <div class="col-md-3">
                     <label for="filtro" class="form-label"><strong>Filtrar Por:</strong></label>
                     <select @bind="filtro" class="form-select"> 
-                        <option value="id">ResgitroId</option>
-                        <option value="Nombre">Nombre</option>
+                        <option value="id">ComboId</option>
+                        <option value="Fecha">Fecha</option>
                         <option value="Descripcion">Descripcion</option>
+                        <option value="Precio">Precio</option>
+                        <option value="Vendido">Vendido</option>
+                                 
                     </select>
                 </div>
 
@@ -24,7 +27,7 @@
                     <label for="valorfiltro" class="form-label"><strong>Busqueda:</strong></label>
                     <div class="input-group">
                         <input @bind="valorfiltro" class="form-control"/>
-                        <button type="button" class="btn btn-outline-primary">
+                        <button type="button" @onclick="Buscar" class="btn btn-outline-primary">
                             <span class="bi bi-search mt-3"></span>
                             Buscar
                         </button>
@@ -34,7 +37,7 @@
                 <div class="row">
                     <div class="col-md-15">
                         <div class="col-md-15 text-end">
-                            <a href="/create" class="btn btn-outline-success" type="button">
+                            <a href="/Combos/Create" class="btn btn-outline-success" type="button">
                                 <span class="bi bi-plus-square-fill mt-3"></span>
                                 Crear
                             </a>
@@ -45,29 +48,33 @@
                 <table class="table table-light table-bordered ">
                     <thead class="table table-striped text-center">
                         <tr>
-                            <th>RegistroId</th>
-                            <th>Nombre</th>
-                            <th>Descrpcion</th>
+                            <th>ComboId</th>
+                            <th>Fecha</th>
+                            <th>Descripcion</th>
+                             <th>Precio</th>
+                             <th>Vendido</th>
                             <th>Ver</th>
                             <th>Modificar</th>
                             <th>Eliminar</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach(var r in ListaRegistros){
+                        @foreach(var c in ListaCombos){
                             <tr>
-                                <td>@r.RegistroId</td>
-                                <td>@r.Nombre</td>
-                                <td>@r.Descripcion</td>
+                                <td>@c.ComboId</td>
+                                <td>@c.Fecha</td>
+                                <td>@c.Descripcion</td>
+                                <td>@c.Precio</td>
+                                <td>@c.Vendido</td>
 
                                 <td class="text-center">
-                                    <a href="Details/@r.RegistroId" class="btn btn-outline-primary bi bi-eye mt-3"></a>
+                                    <a href="Details/@c.ComboId" class="btn btn-outline-primary bi bi-eye mt-3"></a>
                                 </td>
                                 <td class="text-center">
-                                    <a href="Edit/@r.RegistroId" class="btn btn-outline-success bi bi-pencil-square mt-3"></a>
+                                        <a href="/Combos/Edit/@c.ComboId" class="btn btn-outline-success bi bi-pencil-square mt-3"></a>
                                 </td>
                                 <td class="text-center">
-                                    <a href="Delete/@r.RegistroId" class="btn btn-outline-danger bi bi-trash mt-3"></a>
+                                    <a href="Delete/@c.ComboId" class="btn btn-outline-danger bi bi-trash mt-3"></a>
                                 </td>
                             </tr>
                         }
@@ -77,36 +84,46 @@
             </div>
 
             <div class="card-footer">
-                <p>Total:@ListaRegistros.Count</p>
+                <p>Total:@ListaCombos.Count</p>
             </div>
         </div>
 
     </div>
 </div>
 @code {
-    public List<Registros> ListaRegistros { get; set; } = new List<Registros>();
+    public List<Combos> ListaCombos { get; set; } = new List<Combos>();
     public string filtro = "id";
     public string valorfiltro = "";
 
     protected override async Task OnInitializedAsync()
     {
-        ListaRegistros = await registroServices.Listar(r => true);
+
+        ListaCombos = await combosServices.Listar(c => true);
     }
 
     public async Task Buscar(){
         if(string.IsNullOrWhiteSpace(valorfiltro))
         {
-            ListaRegistros = await registroServices.Listar(r => true);
+            ListaCombos = await combosServices.Listar(c => true);
         }else{
-            if(filtro=="id"&&int.TryParse(valorfiltro,out int RegistroId)){
-                ListaRegistros = await registroServices.Listar(r => r.RegistroId==RegistroId);
-            }else if(filtro=="Nombre"){
-                ListaRegistros = await registroServices.Listar(r =>r.Nombre.Contains(valorfiltro));
+            if(filtro=="id"&&int.TryParse(valorfiltro,out int ComboId)){
+                ListaCombos = await combosServices.Listar(c => c.ComboId==ComboId);
+            }else if(filtro=="Fecha"&&DateTime.TryParse(valorfiltro,out DateTime Fecha)){
+               ListaCombos = await combosServices.Listar(c =>c.Fecha==Fecha);
             }
             else if (filtro == "Descripcion")
             {
-                ListaRegistros = await registroServices.Listar(r => r.Descripcion.Contains(valorfiltro));
+                ListaCombos = await combosServices.Listar(c => c.Descripcion.Contains(valorfiltro));
+            }
+            else if (filtro == "Precio" && decimal.TryParse(valorfiltro, out decimal Precio))
+            {
+                ListaCombos = await combosServices.Listar(c => c.Precio==Precio);
+            }
+            else if (filtro == "Vendido")
+            {
+                ListaCombos = await combosServices.Listar(c => c.Vendido.Contains(valorfiltro));
             }
         }
     }
 }
+
